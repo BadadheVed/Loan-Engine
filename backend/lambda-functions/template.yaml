@@ -1,0 +1,114 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: ClickPe Backend API - Health and CSV Upload endpoints
+
+# Global configuration for all functions
+Globals:
+  Function:
+    Timeout: 300
+    MemorySize: 512
+    Runtime: provided.al2023
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        DATABASE_URL: !Ref DatabaseUrl
+
+# Parameters
+Parameters:
+  DatabaseUrl:
+    Type: String
+    Description: PostgreSQL database connection string
+    NoEcho: true
+  
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - production
+    Description: Deployment environment
+
+Resources:
+  # API Gateway
+  ClickPeApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub clickpe-api-${Environment}
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+      BinaryMediaTypes:
+        - multipart/form-data
+
+  # Health Check Lambda Function
+  HealthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub clickpe-health-${Environment}
+      CodeUri: health/
+      Handler: bootstrap
+      Description: Health check endpoint
+      Events:
+        HealthApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ClickPeApi
+            Path: /api/health
+            Method: GET
+    Metadata:
+      BuildMethod: go1.x
+
+  # Upload CSV Lambda Function
+  UploadCSVFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub clickpe-uploadcsv-${Environment}
+      CodeUri: uploadcsv/
+      Handler: bootstrap
+      Description: CSV user upload endpoint
+      Timeout: 900
+      MemorySize: 1024
+      Environment:
+        Variables:
+          WORKER_COUNT: '5'
+          BATCH_SIZE: '100'
+      Events:
+        UploadCSVApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ClickPeApi
+            Path: /api/uploadcsv
+            Method: POST
+    Metadata:
+      BuildMethod: go1.x
+
+  # CloudWatch Log Groups
+  HealthFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/clickpe-health-${Environment}
+      RetentionInDays: 7
+
+  UploadCSVFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/clickpe-uploadcsv-${Environment}
+      RetentionInDays: 7
+
+# Outputs
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${ClickPeApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}
+
+  HealthEndpoint:
+    Description: Health check endpoint
+    Value: !Sub https://${ClickPeApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/api/health
+
+  UploadCSVEndpoint:
+    Description: Upload CSV endpoint
+    Value: !Sub https://${ClickPeApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/api/uploadcsv

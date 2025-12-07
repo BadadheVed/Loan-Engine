@@ -1,0 +1,36 @@
+# AWS SAM Build artifacts
+.aws-sam/
+samconfig.toml
+
+# Lambda build artifacts
+lambda-functions/*/bootstrap
+lambda-functions/*/*.zip
+clickpe-backend
+
+# Environment files
+env.json
+.env
+.env.local
+.env.*.local
+.aws-sam/build/**/env.json
+.aws-sam
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
