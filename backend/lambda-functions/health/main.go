@@ -34,7 +34,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	// Validate DATABASE_URL format
-	if !strings.HasPrefix(databaseURL, "postgresql://") {
+	if !strings.HasPrefix(databaseURL, "postgres://") && !strings.HasPrefix(databaseURL, "postgresql://") {
 		response := Response{
 			Error: "Database connection not configured properly",
 		}

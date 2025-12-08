@@ -42,6 +42,8 @@ samconfig.toml
 # Go module files (if you want to ignore local replace targets)
 replace.go
 n8n_data/
-Makefile.local
-Makefile
+
+
 test_users.csv
+create-rds.sh
+rds-permissions-policy.json
