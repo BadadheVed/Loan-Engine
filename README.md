@@ -9,8 +9,6 @@ This repository contains both the frontend and backend components for seamless d
 
 ![Landing Page](assets/architecture.png)
 
----
-
 ## Repository Structure
 
 Below is an example directory structure for this repository:
@@ -26,7 +24,7 @@ Loan-Engine/
 │   │   ├── uploadcsv/
 │   │   │   ├── uploadcsv
 │   │   │   └── bootstrap (binary)
-│   │   └── template.yaml    # AWS SAM template for Lambda deployment
+│   │   └── template.yaml    # AWS SAM
 |   |   ├── shared/
 │   │   │   ├── database.go (shared db instance)
 │   │   │   └── models.go  (DB Models)
