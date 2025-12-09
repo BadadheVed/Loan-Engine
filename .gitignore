@@ -41,8 +41,8 @@ Thumbs.db
 samconfig.toml
 # Go module files (if you want to ignore local replace targets)
 replace.go
-n8n_data/
 
+n8nEventLog.log
 
 test_users.csv
 create-rds.sh
