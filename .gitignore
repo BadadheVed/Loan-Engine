@@ -34,6 +34,7 @@ Thumbs.db
 
 # Go build cache
 /cache/
+n8n_data/
 
 # Test binary, coverage, and result files
 *.coverprofile
